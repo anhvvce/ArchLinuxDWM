@@ -1,0 +1,33 @@
+#
+# This file is parsed by pam_env module
+#
+# Syntax: simple "KEY=VAL" pairs on separate lines
+#
+
+# Intel HD Graphics 620
+LIBVA_DRIVERS_PATH=/usr/lib/dri
+LIBVA_DRIVER_NAME=iHD
+VDPAU_DRIVER=va_gl
+ANV_VIDEO_DECODE=1
+VAAPI_MPEG4_ENABLED=true
+
+# OpenCL
+OCL_ICD_VENDORS=/etc/OpenCL/vendors/intel_legacy1.icd
+
+# Cursor
+XCURSOR_THEME=Bibata-Modern-Ice
+XCURSOR_SIZE=24
+
+# IBus
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
+
+# Missing Glyph
+COGL_ATLAS_DEFAULT_BLIT_MODE=framebuffer
+
+# Qt and GTK theme
+QT_QPA_PLATFORMTHEME=gtk3
+
+# Ranger File Manager
+RANGER_LOAD_DEFAULT_RC=false
