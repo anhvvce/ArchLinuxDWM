@@ -1,0 +1,104 @@
+# Only run in interactive shells
+[[ $- != *i* ]] && return
+
+############################
+# Colors (ANSI 24-bit)
+############################
+RED="\[\033[38;2;255;0;0m\]"
+BLUE="\[\033[38;2;123;179;255m\]"
+GREEN="\[\033[38;2;152;255;152m\]"
+PINK="\[\033[38;2;255;152;255m\]"
+YELLOW="\[\033[38;2;190;155;123m\]"
+GREY="\[\033[38;2;41;39;36m\]"
+ORANGE="\[\033[38;2;255;99;71m\]"
+CYAN="\[\033[38;2;71;227;255m\]"
+NORMAL="\[\033[0m\]"
+
+############################
+# Aliases
+############################
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+
+alias update='
+sudo timedatectl set-ntp true &&
+sudo pacman -Syu &&
+yay -Syu &&
+sudo pacman -Scc --noconfirm &&
+yay -Scc --noconfirm &&
+orphans=$(pacman -Qtdq 2>/dev/null) &&
+[ -n "$orphans" ] && sudo pacman -Rns $orphans
+'
+
+############################
+# Icons
+############################
+ARCH_ICON="\[\033[38;2;210;31;60m\] "
+FOLDER_ICON="\[\033[38;2;255;152;255m\] "
+MULTI_LINE_ICON_1="\[\033[38;2;190;155;123m\]╭─"
+MULTI_LINE_ICON_2="\[\033[38;2;190;155;123m\]╰─"
+CIRCLE_ICON="\[\033[38;2;41;39;36m\] "
+CIRCLE_DOT_ICON="\[\033[38;2;152;255;152m\] "
+BRANCH_NAME_ICON="\[\033[38;2;255;99;71m\] "
+
+############################
+# Git branch (fast & safe)
+############################
+__git_branch() {
+    local branch
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
+    printf "%s[%s%s%s]" "$BRANCH_NAME_ICON" "$CYAN" "$branch" "$ORANGE"
+}
+
+############################
+# Exit status indicator
+############################
+__prompt_exit_status() {
+    local status=$?
+
+    # Skip first prompt
+    if [[ -z ${__PROMPT_INIT+x} ]]; then
+        __PROMPT_INIT=1
+        return
+    fi
+
+    tput sc
+    tput cuf $(( $(tput cols) - 2 ))
+
+    if [[ $status -eq 0 ]]; then
+        printf "\033[38;2;0;255;0m "
+    else
+        printf "\033[38;2;255;0;0m✘ "
+    fi
+
+    tput rc
+}
+
+############################
+# Cursor helpers (PS0)
+############################
+__ps0_up() {
+    tput cuu 2
+}
+
+__ps0_down() {
+    tput cud 1
+    tput cub 4
+}
+
+############################
+# PROMPT_COMMAND (append-safe)
+############################
+PROMPT_COMMAND="__prompt_exit_status${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+
+############################
+# PS1 (before typing)
+############################
+PS1="${MULTI_LINE_ICON_1}${ARCH_ICON} ${FOLDER_ICON}${PINK}[${GREEN}\W${PINK}] \[\$(__git_branch)\]
+${MULTI_LINE_ICON_2}${CIRCLE_ICON}${NORMAL} "
+
+############################
+# PS0 (after Enter)
+############################
+PS0="\[\$(__ps0_up)\]${MULTI_LINE_ICON_1}${ARCH_ICON} ${FOLDER_ICON}${PINK}[${GREEN}\W${PINK}] \[\$(__git_branch)\]
+${MULTI_LINE_ICON_2}${CIRCLE_DOT_ICON}${NORMAL}\[\$(__ps0_down)\]"
